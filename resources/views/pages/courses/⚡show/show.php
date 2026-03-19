@@ -19,9 +19,13 @@ new #[Layout('layouts::home')] class extends Component
     public function mount(Course $course)
     {
         $this->course = $course;
-        $this->course->load('reviews');
-        $this->course->loadCount('reviews');
+        $this->course->load(['reviews'])->loadCount('reviews');
         $this->checkEnrollmentStatus();
+    }
+
+    public function hydrate()
+    {
+        $this->course->load(['reviews'])->loadCount('reviews');
     }
 
     #[Computed()]

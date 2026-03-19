@@ -12,7 +12,7 @@
             </a>
         </div>
     </div>
-    {{-- {{ dd($course->reviews) }} --}}
+
     {{-- Course Hero Image --}}
     <div class="relative aspect-video bg-linear-to-br from-blue-500 via-purple-500 to-pink-500">
         @if ($course->image)
@@ -39,7 +39,7 @@
     </div>
 
     {{-- Main Content --}}
-    <div class="">
+    <div>
         {{-- Course Header --}}
         <div class="px-4 py-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-3 leading-tight">
