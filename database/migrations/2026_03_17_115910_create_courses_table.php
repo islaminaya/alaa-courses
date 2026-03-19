@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->string('category');
+            $table->foreignId('category_id')->index()->constrained();
             $table->string('image')->nullable();
             $table->decimal('price', 10, 2)->default(0);
             $table->decimal('original_price', 10, 2)->nullable();

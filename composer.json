@@ -61,7 +61,7 @@
             "vendor/bin/rector process"
         ],
         "phpstan": [
-            "vendor/bin/phpstan analyze"
+            "vendor/bin/phpstan analyze --memory-limit=1024M"
         ],
         "lint": [
             "pint --parallel"
@@ -80,7 +80,9 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@commit",
+            "@lint",
+            "@rector",
+            "@phpstan",
             "@php artisan test"
         ],
         "post-autoload-dump": [

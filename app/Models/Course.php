@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Database\Factories\CourseFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection as ArrayCollection;
 
 class Course extends Model
 {
@@ -19,7 +22,7 @@ class Course extends Model
     protected $fillable = [
         'title',
         'description',
-        'category',
+        'category_id',
         'image',
         'price',
         'original_price',
@@ -33,43 +36,73 @@ class Course extends Model
         'instructor_id',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'original_price' => 'decimal:2',
-        'rating' => 'decimal:2',
-        'is_new' => 'boolean',
-        'requirements' => 'array',
-    ];
-
     /**
-     * @return BelongsTo<User, $this>
+     * @return HasMany<Enrollment, $this>
      */
-    public function instructor(): BelongsTo
+    public function enrollments(): HasMany
     {
-        return $this->belongsTo(User::class, 'instructor_id');
+        return $this->hasMany(Enrollment::class);
     }
 
-    // public function enrollments(): HasMany
-    // {
-    //     return $this->hasMany(Enrollment::class);
-    // }
-
-    // public function isEnrolledBy($user)
-    // {
-    //     return $this->enrollments()->where('user_id', $user->id)->exists();
-    // }
+    public function isEnrolledBy(User $user): bool
+    {
+        return $this->enrollments()->where('user_id', $user->id)->exists();
+    }
 
     /**
      * @param  Builder<static>  $query
      * @return Builder<static>
      */
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): Builder
     {
         return $query->where('status', 'active');
     }
 
-    // public function scopeCategory($query, $category): void
-    // {
-    //     return $query->where('category', $category);
-    // }
+    /**
+     * @return BelongsTo<Category, $this>
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return HasMany<Review, $this>
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /** @return ArrayCollection<int, float> */
+    public function ratingBreakdown(): ArrayCollection
+    {
+        $total = $this->reviews()->count();
+
+        if ($total === 0) {
+            return collect([5, 4, 3, 2, 1])->mapWithKeys(fn ($star) => [$star => 0.0]);
+        }
+
+        $grouped = $this->reviews()
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating');
+
+        /** @var ArrayCollection<int, int> $grouped */
+        return $grouped->mapWithKeys(fn ($count, $rating) => [$rating => round(($count / $total) * 100)])
+            ->union([5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0])
+            ->sortKeysDesc();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'original_price' => 'decimal:2',
+            'rating' => 'decimal:2',
+            'is_new' => 'boolean',
+            'requirements' => 'array',
+        ];
+    }
 }
