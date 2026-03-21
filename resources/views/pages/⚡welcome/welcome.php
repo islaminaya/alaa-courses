@@ -2,6 +2,7 @@
 
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -20,14 +21,23 @@ new #[Layout('layouts::home')] class extends Component
         return $this->getCourses($this->limit);
     }
 
-    // public $categories = [
-    //     'all' => 'All Courses',
-    //     'cardiology' => 'Cardiology',
-    //     'neurology' => 'Neurology',
-    //     'pediatrics' => 'Pediatrics',
-    //     'surgery' => 'Surgery',
-    //     'radiology' => 'Radiology',
-    // ];
+    #[Computed()]
+    public function studentCount()
+    {
+        return User::count();
+    }
+
+    #[Computed()]
+    public function courseCount()
+    {
+        return Course::count();
+    }
+
+    #[Computed()]
+    public function averageRating()
+    {
+        return round(Course::average('rating'), 1);
+    }
 
     public $categories;
 

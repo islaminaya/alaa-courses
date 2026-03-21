@@ -80,17 +80,17 @@
     <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-6">
         <div class="flex items-center justify-around text-center max-w-2xl mx-auto">
             <div>
-                <div class="text-2xl font-bold">150+</div>
+                <div class="text-2xl font-bold">{{ $this->courseCount }}+</div>
                 <div class="text-xs opacity-90">Courses</div>
             </div>
             <div class="w-px h-8 bg-white/30"></div>
             <div>
-                <div class="text-2xl font-bold">50K+</div>
+                <div class="text-2xl font-bold">{{ $this->studentCount }}+</div>
                 <div class="text-xs opacity-90">Students</div>
             </div>
             <div class="w-px h-8 bg-white/30"></div>
             <div>
-                <div class="text-2xl font-bold">4.8★</div>
+                <div class="text-2xl font-bold">{{ $this->averageRating }}★</div>
                 <div class="text-xs opacity-90">Average Rating</div>
             </div>
         </div>
@@ -160,7 +160,7 @@
                         </div>
 
                         {{-- Course Info --}}
-                        <a href="{{ route('courses.show', $course) }}"
+                        <a href="{{ route('courses.show', $course) }}" wire:navigate
                             class="block p-4 hover:bg-gray-50 transition-colors">
                             <h3
                                 class="font-bold text-gray-900 text-base mb-2 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">

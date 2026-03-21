@@ -18,9 +18,11 @@
                 <p class="text-gray-600 text-sm mb-6 max-w-xs">
                     We couldn't find any courses matching your criteria. Try adjusting your filters.
                 </p>
-                <flux:button wire:click="$set('selectedCategory', 'all'); $set('searchQuery', '')" variant="primary">
-                    View All Courses
-                </flux:button>
+                <a href="{{ route('home') }}" wire:navigate>
+                    <flux:button variant="primary">
+                        View All Courses
+                    </flux:button>
+                </a>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

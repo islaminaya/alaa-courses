@@ -7,7 +7,7 @@
     {{-- Mobile Header --}}
     <div class="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div class="flex items-center justify-between px-4 py-3">
-            <a href="{{ route('home') }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <a href="{{ route('home') }}" wire:navigate class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <flux:icon.arrow-left class="w-6 h-6 text-gray-700" />
             </a>
         </div>
@@ -238,11 +238,14 @@
                         <span class="text-3xl font-bold text-green-600">Free</span>
                     @endif
                 </div>
-                <form action="{{ route('checkout', $course) }}" method="post">
+                <form x-data="{ loading: false }" x-on:submit="loading = true" action="{{ route('checkout', $course) }}"
+                    method="post">
                     @csrf
-                    <flux:button type="submit" variant="primary" icon:trailing="arrow-right"
-                        class="max-w-xs shadow-lg">
-                        {{ $authenticated ? 'Checkout' : 'Enroll Now' }}
+
+                    <flux:button type="submit" x-bind:disabled="loading" class="max-w-xs shadow-lg" variant="primary" icon:trailing="arrow-right">
+                        <span x-show="!loading">
+                            {{ $authenticated ? 'Checkout' : 'Enroll Now' }}
+                        </span>
                     </flux:button>
                 </form>
             </div>
