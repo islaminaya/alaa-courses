@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection as ArrayCollection;
 
@@ -93,6 +95,14 @@ class Course extends Model
         return $grouped->mapWithKeys(fn ($count, $rating) => [$rating => round(($count / $total) * 100)])
             ->union([5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0])
             ->sortKeysDesc();
+    }
+
+    /**
+     * @return BelongsToMany<User, $this, Pivot>
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'enrollments');
     }
 
     protected function casts(): array

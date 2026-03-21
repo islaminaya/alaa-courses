@@ -34,7 +34,7 @@ class Enrollment extends Model
     /**
      * @return BelongsTo<Course, $this>
      */
-    public function course(): BelongsTo
+    public function courses(): BelongsTo
     {
         return $this->belongsTo(Course::class);
     }

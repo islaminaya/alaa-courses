@@ -60,7 +60,6 @@ new #[Layout('layouts::home')] class extends Component
     public function selectCategory($category)
     {
         $this->selectedCategory = $category;
-        // dd($this->selectedCategory);
     }
 
     public function loadMore()

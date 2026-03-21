@@ -6,7 +6,6 @@ use App\Actions\EnrollmentAction;
 use App\Models\Course;
 use App\Services\CheckoutService;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -30,7 +29,7 @@ class CheckoutController extends Controller
         return redirect()->away($session->url ?? route('home'));
     }
 
-    public function success(Request $request): View
+    public function success(Request $request): RedirectResponse
     {
         /** @var string */
         $apiKey = config('services.stripe.secret');
@@ -59,7 +58,7 @@ class CheckoutController extends Controller
                     $session
                 );
 
-            return view('welcome');
+            return to_route('dashboard');
 
         } catch (ApiErrorException $e) {
             throw new NotFoundHttpException('Information not found.', $e);

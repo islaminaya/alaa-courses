@@ -209,54 +209,46 @@
                             @endforeach
                         @endif
                     </div>
-
-                    {{-- <flux:button variant="ghost" class="w-full">
-                        Load More Reviews
-                    </flux:button> --}}
                 </div>
             @endif
         </div>
     </div>
 
     {{-- Fixed Bottom Enrollment Bar --}}
-    <div class="fixed bottom-0 left-0 right-0 bg-blue-600 border-t border-gray-200 px-4 py-4 z-40 shadow-xl">
-        <div class="flex items-center justify-between gap-4 max-w-2xl mx-auto">
-            <div>
-                @if ($course->price > 0)
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-bold text-gray-900">${{ number_format($course->price, 0) }}</span>
-                        @if ($course->original_price)
+    @if (!$isEnrolled)
+        <div class="fixed bottom-0 left-0 right-0 bg-blue-600 border-t border-gray-200 px-4 py-4 z-40 shadow-xl">
+            <div class="flex items-center justify-between gap-4 max-w-2xl mx-auto">
+                <div>
+                    @if ($course->price > 0)
+                        <div class="flex items-baseline gap-2">
                             <span
-                                class="text-lg text-gray-400 line-through">${{ number_format($course->original_price, 0) }}</span>
+                                class="text-3xl font-bold text-gray-900">${{ number_format($course->price, 0) }}</span>
+                            @if ($course->original_price)
+                                <span
+                                    class="text-lg text-gray-400 line-through">${{ number_format($course->original_price, 0) }}</span>
+                            @endif
+                        </div>
+                        @if ($course->original_price)
+                            <p class="text-xs text-green-600 font-semibold">
+                                Save
+                                {{ round((($course->original_price - $course->price) / $course->original_price) * 100) }}%
+                            </p>
                         @endif
-                    </div>
-                    @if ($course->original_price)
-                        <p class="text-xs text-green-600 font-semibold">
-                            Save
-                            {{ round((($course->original_price - $course->price) / $course->original_price) * 100) }}%
-                        </p>
+                    @else
+                        <span class="text-3xl font-bold text-green-600">Free</span>
                     @endif
-                @else
-                    <span class="text-3xl font-bold text-green-600">Free</span>
-                @endif
+                </div>
+                <form action="{{ route('checkout', $course) }}" method="post">
+                    @csrf
+                    <flux:button type="submit" variant="primary" icon:trailing="arrow-right"
+                        class="max-w-xs shadow-lg">
+                        {{ $authenticated ? 'Checkout' : 'Enroll Now' }}
+                    </flux:button>
+                </form>
             </div>
-
-            @if ($isEnrolled)
-                <flux:button href="{{ route('courses.learn', $course) }}" variant="primary" class="flex-1 max-w-xs">
-                    Continue Learning
-                    <flux:icon.arrow-right class="w-5 h-5" />
-                </flux:button>
-            @else
-            <form action="{{ route('checkout', $course) }}" method="post">
-                @csrf
-                <flux:button type="submit" variant="primary" icon:trailing="arrow-right"
-                    class="max-w-xs shadow-lg">
-                    {{ $authenticated ? 'Checkout' :'Enroll Now' }}
-                </flux:button>
-            </form>
-            @endif
         </div>
-    </div>
+    @endif
+
 
     {{-- Success/Error Messages --}}
     @if (session()->has('success'))
