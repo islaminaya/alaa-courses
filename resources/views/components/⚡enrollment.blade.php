@@ -14,6 +14,10 @@ new class extends Component {
 
     public $original_price;
 
+    public $couponApplied = false;
+
+    public $responseType = 'error';
+
     public function mount()
     {
         $this->price = $this->course->price;
@@ -22,15 +26,33 @@ new class extends Component {
 
     public function check()
     {
+        if($this->couponCode === ''){
+            $this->response = 'The coupon is not available';
+            $this->responseType = 'error';
+            return;
+        }
+
+        if ($this->couponApplied) {
+            $this->response = 'Coupon already applied';
+            $this->responseType = 'error';
+            return;
+        }
+
         $coupon = $this->course->getActiveCoupon();
 
         if ($coupon === null || $coupon->code !== $this->couponCode) {
             $this->response = 'The coupon is not available';
+            $this->responseType = 'error';
             return;
         }
 
         $this->original_price = ($this->original_price * (100 - $coupon->discount)) / 100;
         $this->price = ($this->price * (100 - $coupon->discount)) / 100;
+
+        $this->couponApplied = true;
+
+        $this->response = 'Coupon applied successfully';
+        $this->responseType = 'success';
     }
 };
 ?>
@@ -68,10 +90,15 @@ new class extends Component {
                     <div class="flex gap-3">
                         <flux:input wire:model='couponCode' />
                         <flux:error name="coupon" />
-                        <flux:button class="flex self-end" wire:click='check'>Check</flux:button>
+                        <flux:button
+                            class="flex self-end"
+                            wire:click='check'
+                        >Check</flux:button>
                     </div>
                     @if ($response)
-                        <span class="text-red-500 text-sm">{{ $response }}</span>
+                        <span class="text-sm {{ $responseType === 'success' ? 'text-green-500' : 'text-red-500' }}">
+                            {{ $response }}
+                        </span>
                     @endif
                 </form>
             </div>
