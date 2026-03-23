@@ -16,7 +16,7 @@ class CheckoutService
         Stripe::setApiKey($apiKey);
     }
 
-    public static function createCheckoutSession(Course $course, string $successUrl, string $cancelUrl): Session
+    public static function createCheckoutSession(Course $course, string $couponCode, string $successUrl, string $cancelUrl): Session
     {
         self::setUp();
 
@@ -26,7 +26,7 @@ class CheckoutService
                     'quantity' => 1,
                     'price_data' => [
                         'currency' => 'usd',
-                        'unit_amount' => (int) ($course->price * 100),
+                        'unit_amount' => (int) (self::amount($course, $couponCode) * 100),
                         'product_data' => [
                             'name' => $course->title,
                         ],
@@ -40,5 +40,15 @@ class CheckoutService
                 'course_id' => (string) $course->id,
             ],
         ]);
+    }
+
+    private static function amount(Course $course, string $couponCode): float
+    {
+        $coupon = $course->getActiveCoupon();
+        if ($coupon && $coupon->code === $couponCode) {
+            return $course->price * (100 - $coupon->discount) / 100;
+        }
+
+        return $course->price;
     }
 }

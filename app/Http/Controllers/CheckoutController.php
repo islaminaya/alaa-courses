@@ -16,14 +16,22 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CheckoutController extends Controller
 {
-    public function checkout(Course $course): RedirectResponse|Redirector
+    public function checkout(Course $course, string $code = ''): RedirectResponse|Redirector
     {
         if ($course->price > 0) {
             $session = CheckoutService::createCheckoutSession(
                 $course,
+                $code,
                 route('checkout.success').'?session_id={CHECKOUT_SESSION_ID}',
                 route('checkout.cancel')
             );
+        } else {
+            (new EnrollmentAction)
+                ->handle(
+                    $course,
+                    auth()->user() ?? throw new AuthenticationException,
+                    null
+                );
         }
 
         return redirect()->away($session->url ?? route('home'));

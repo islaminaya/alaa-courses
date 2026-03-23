@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Course;
 use App\Models\Review;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Foundation\Auth\User;
 
 /**
  * @extends Factory<Review>
@@ -20,10 +20,10 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => fake()->randomElement(User::pluck('id')->toArray()),
-            'course_id' => fake()->randomElement(Course::pluck('id')->toArray()),
+            'user_id' => User::factory(),
+            'course_id' => Course::factory(),
             'rating' => fake()->numberBetween(1, 5),
-            'review' => fake()->randomElement([null, fake()->realText()]),
+            'comment' => fake()->optional()->realText(),
         ];
     }
 }

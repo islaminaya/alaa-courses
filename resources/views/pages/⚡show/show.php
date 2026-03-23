@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Review;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -10,20 +11,26 @@ new #[Layout('layouts::home')] class extends Component
 {
     public Course $course;
 
-    public $activeTab = 'overview';
+    public $isEnrolled = false;
 
     public $showEnrollModal = false;
 
-    public $isEnrolled = false;
+    public $userHasReviewed = false;
 
-    public $authenticated;
+    public $relatedCourses;
+
+    public $reviewLimit = 1;
 
     public function mount(Course $course)
     {
         $this->course = $course;
+        $this->relatedCourses = $this->getRelatedCourses();
         $this->course->load(['reviews'])->loadCount('reviews');
-        $this->authenticated = Auth::check();
-        $this->checkEnrollmentStatus();
+
+        if (Auth::check()) {
+            $this->isEnrolled = $this->course->isEnrolledBy(Auth::user());
+            $this->userHasReviewed = $this->course->hasReviewBy(Auth::user());
+        }
     }
 
     public function hydrate()
@@ -36,7 +43,15 @@ new #[Layout('layouts::home')] class extends Component
     {
         return Review::where('course_id', $this->course->id)
             ->orderBy('rating', 'desc')
+            ->limit($this->reviewLimit)
             ->get();
+    }
+
+    public function loadMoreReviews()
+    {
+        dd('clicked');
+        $this->reviewLimit += 3;
+        $this->reviews();
     }
 
     public function checkEnrollmentStatus()
@@ -75,9 +90,56 @@ new #[Layout('layouts::home')] class extends Component
         // return redirect()->route('courses.learn', $this->course);
     }
 
-    public function setActiveTab($tab)
+    public function enrollNow()
     {
-        $this->activeTab = $tab;
+        if (! Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        if ($this->isEnrolled) {
+            session()->flash('message', 'You are already enrolled in this course.');
+
+            return;
+        }
+
+        // For free courses, enroll immediately
+        if ($this->course->price == 0) {
+            $this->createEnrollment();
+            $this->isEnrolled = true;
+            session()->flash('success', 'Successfully enrolled in the course!');
+
+            return redirect()->route('courses.learn', $this->course);
+        }
+
+        // For paid courses, redirect to checkout
+        return redirect()->route('checkout', $this->course);
+    }
+
+    protected function createEnrollment()
+    {
+        Enrollment::create([
+            'user_id' => Auth::id(),
+            'course_id' => $this->course->id,
+            'status' => 'enrolled',
+            'enrolled_at' => now(),
+        ]);
+
+        // Increment students count
+        $this->course->increment('students_count');
+    }
+
+    protected function getRelatedCourses()
+    {
+        return Course::where('category', $this->course->category)
+            ->where('id', '!=', $this->course->id)
+            ->where('status', 'active')
+            ->limit(4)
+            ->get();
+    }
+
+    public function submitReview()
+    {
+        dd($this->reviewRating, $this->reviewComment);
     }
 
     public function toggleEnrollModal()

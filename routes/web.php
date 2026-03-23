@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
-    Route::post('checkout/{course}', [CheckoutController::class, 'checkout'])->name('checkout');
+    Route::post('checkout/{course}/{code?}', [CheckoutController::class, 'checkout'])->name('checkout');
     Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 });

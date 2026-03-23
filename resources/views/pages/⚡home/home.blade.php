@@ -1,9 +1,3 @@
-{{-- Import Google Fonts --}}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
 
 <div class="min-h-screen bg-white font-sans" x-data="{ mobileMenuOpen: false }">
     {{-- Hero Section --}}
@@ -26,7 +20,7 @@
             <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
         </div>
 
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 ">
             {{-- Navigation --}}
             <nav class="py-6 mb-12 animate-slide-down">
                 <div class="flex items-center justify-between ">
@@ -50,7 +44,7 @@
                         </div>
                     @endauth
                     @guest
-                        <div class="0">
+                        <div class="flex items-center gap-5">
                             <a href="{{ route('login') }}"
                                 class="hidden sm:block text-gray-700 hover:text-blue-600 font-medium px-4 py-2 transition-colors">
                                 Sign In

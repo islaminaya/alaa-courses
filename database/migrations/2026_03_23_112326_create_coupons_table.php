@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('coupons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->foreignId('course_id')->constrained();
-            $table->integer('rating');
-            $table->string('comment')->nullable();
+            $table->string('code');
+            $table->integer('discount');
+            $table->date('expiry_date');
             $table->timestamps();
-
-            $table->unique(['course_id', 'user_id']);
-            $table->index('course_id');
-            $table->index('rating');
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('coupons');
     }
 };

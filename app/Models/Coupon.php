@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\CouponFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Coupon extends Model
+{
+    /** @use HasFactory<CouponFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'course_id',
+        'code',
+        'discount',
+        'expiry_date',
+    ];
+
+    /**
+     * @param  Builder<Coupon>  $query
+     * @return Builder<Coupon>
+     */
+    #[Scope]
+    protected function active(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q) {
+            $q->whereNull('expires_at')
+                ->orWhere('expires_at', '>', now());
+        });
+    }
+}

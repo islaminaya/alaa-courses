@@ -4,12 +4,7 @@ use App\Models\Course;
 use Livewire\Component;
 
 new class extends Component {
-    public $course;
-
-    public function mount(Course $course)
-    {
-        $this->course = $course;
-    }
+    public Course $course;
 };
 ?>
 

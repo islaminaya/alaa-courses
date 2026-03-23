@@ -48,7 +48,9 @@ class Course extends Model
 
     public function isEnrolledBy(User $user): bool
     {
-        return $this->enrollments()->where('user_id', $user->id)->exists();
+        return $this->enrollments()
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     /**
@@ -62,11 +64,34 @@ class Course extends Model
     }
 
     /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    #[Scope]
+    protected function scopeCategory(Builder $query, Category $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    /**
      * @return BelongsTo<Category, $this>
      */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function instructor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    public function hasReviewBy(User $user): bool
+    {
+        return $this->reviews()->where('user_id', $user->id)->exists();
     }
 
     /**
@@ -103,6 +128,34 @@ class Course extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'enrollments');
+    }
+
+    public function updateRating(): void
+    {
+        /** @var float $avgRating */
+        $avgRating = $this->reviews()->avg('rating');
+        $reviewsCount = $this->reviews()->count();
+
+        $this->update([
+            'rating' => $avgRating ? round($avgRating, 2) : null,
+            'reviews_count' => $reviewsCount,
+        ]);
+    }
+
+    /**
+     * @return HasMany<Coupon, $this>
+     */
+    public function coupons(): HasMany
+    {
+        return $this->hasMany(Coupon::class);
+    }
+
+    public function getActiveCoupon(): ?Coupon
+    {
+        /** @var Builder<Coupon> $query */
+        $query = $this->coupons()->getQuery();
+
+        return $query->active()->first();
     }
 
     protected function casts(): array
