@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Coupon;
-use App\Models\User;
+use App\Models\Course;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Str;
 
@@ -20,7 +20,7 @@ class CouponFactory extends Factory
     public function definition(): array
     {
         return [
-            'course_id' => fake()->randomElement(User::pluck('id')->toArray()),
+            'course_id' => fake()->unique()->randomElement(Course::pluck('id')->toArray()),
             'code' => Str::random(5),
             'discount' => fake()->numberBetween(1, 10),
             'expiry_date' => now()->addDays(14),
